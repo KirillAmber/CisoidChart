@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kirill_amber.cisoidchart.Main;
 import com.kirill_amber.cisoidchart.model.Axis;
+import com.kirill_amber.cisoidchart.model.Cisoid;
 import com.kirill_amber.cisoidchart.model.Square;
 
 
@@ -32,6 +33,8 @@ public class ChartScreen implements Screen {
 
     private float difference_between_axles;
     private float line_spacing;
+
+    Cisoid cisoid;
 
     @Override
     public void show() {
@@ -56,10 +59,12 @@ public class ChartScreen implements Screen {
             arrayHorizontalLines[i] = new Axis();
         }
 
+        cisoid = new Cisoid(100, 2000);
     }
     //как масштабировать
     public void update(float dt){
         camera.update();
+
         xAxis.setX(Gdx.graphics.getWidth()-Gdx.graphics.getWidth());
         xAxis.setY(Gdx.graphics.getHeight()/2.0f);
         xAxis.setX2(Gdx.graphics.getWidth());
@@ -77,8 +82,6 @@ public class ChartScreen implements Screen {
 
            yAxis.setY2(Gdx.graphics.getHeight()-(Gdx.graphics.getHeight()-Gdx.graphics.getWidth())/2.0f);
            yAxis.setY((Gdx.graphics.getHeight()-Gdx.graphics.getWidth())/2.0f);
-           /*yAxis.setY2(Gdx.graphics.getWidth());
-           yAxis.setY(Gdx.graphics.getHeight()-Gdx.graphics.getWidth());*/
 
        }
        else if(Gdx.graphics.getHeight() < Gdx.graphics.getWidth()){
@@ -86,10 +89,8 @@ public class ChartScreen implements Screen {
 
            xAxis.setX2(Gdx.graphics.getWidth()-(Gdx.graphics.getWidth()-Gdx.graphics.getHeight())/2.0f);
            xAxis.setX((Gdx.graphics.getWidth()-Gdx.graphics.getHeight())/2.0f);
-           //xAxis.setX2(Gdx.graphics.getHeight());
-           //xAxis.setX(Gdx.graphics.getWidth()-Gdx.graphics.getHeight());
-       }
 
+       }
 
        difference_between_axles = xAxis.getX2()-yAxis.getX();
        line_spacing = difference_between_axles/(SIZE_GRID/2.0f);
@@ -123,27 +124,8 @@ public class ChartScreen implements Screen {
             count++;
         }
 
-
-
-        /*for(int i = 0; i < arrayVerticalLines.length; i++){
-            arrayVerticalLines[i].setX(xAxis.getX()+i*37.938105f);
-            arrayVerticalLines[i].setX2(xAxis.getX()+i*37.938105f);
-            arrayVerticalLines[i].setY(yAxis.getY());
-            arrayVerticalLines[i].setY2(yAxis.getY2());
-        }
-
-        for(int i = 0; i < arrayHorizontalLines.length; i++){
-            arrayHorizontalLines[i].setX(xAxis.getX());
-            arrayHorizontalLines[i].setX2(xAxis.getX2());
-            arrayHorizontalLines[i].setY(yAxis.getY()+i*37.938105f);
-            arrayHorizontalLines[i].setY2(yAxis.getY()+i*37.938105f);
-        }*/
-
-
-
        square.setX(Gdx.graphics.getWidth()/2.0f-square.getSize()/2.0f);
        square.setY(Gdx.graphics.getHeight()/2.0f-square.getSize()/2.0f);
-
 
     }
 
@@ -167,15 +149,17 @@ public class ChartScreen implements Screen {
         }
         xAxis.draw(camera.combined);
         yAxis.draw(camera.combined);
-        //shapeRenderer.rect(Gdx.graphics.getWidth()/2.0f-width/2.0f, Gdx.graphics.getHeight()/2.0f-height/2.0f, 50, 50, width, height, 1, 1, 0);
-        //shapeRenderer.rect(50, 50, 50, 50, 100, 100, 1, 1, 0);
+
+        //cisoid.drawGraph((xAxis.getX2()-xAxis.getX())/2.0f, (yAxis.getY2()-yAxis.getY())/2.0f, camera.combined);
+
+        cisoid.drawGraph(Gdx.graphics.getWidth()/2.0f, Gdx.graphics.getHeight()/2.0f,
+                xAxis.getX2(), yAxis.getY2(), camera.combined);
         sb.end();
     }
 
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
-        System.out.println(Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight());
     }
 
     @Override
