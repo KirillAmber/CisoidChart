@@ -16,6 +16,8 @@ import java.util.ArrayList;
 public class Cisoid {
     private ShapeRenderer shapeRenderer;
     private float a;
+    private float x;
+    private float yy;
     private float length_graph;
 
     public Cisoid(float a, float length_graph){
@@ -24,9 +26,18 @@ public class Cisoid {
         shapeRenderer = new ShapeRenderer();
     }
 
+    public float getA() {
+        return a;
+    }
+
+    public float getLength_graph() {
+        return length_graph;
+    }
+
+    public float getX(){
+        return x;
+    }
     public void drawGraph(float centerX, float centerY, float xAxis_boundary, float yAxis_boundary, Matrix4 camera){
-        float x;
-        float yy;
         shapeRenderer.begin(ShapeRenderer.ShapeType.Point);
         for(int i = 0; i < length_graph; i++){
             x = i;
@@ -34,10 +45,12 @@ public class Cisoid {
                 continue;
             }
             yy = (float)Math.pow(x,3)/(2*a-x);
-            if(centerX + x > xAxis_boundary)
+            if(centerX + x > xAxis_boundary) {
                 break;
-            if(centerY+(float)Math.sqrt(yy) > yAxis_boundary)
+            }
+            if(centerY+(float)Math.sqrt(yy) > yAxis_boundary) {
                 break;
+            }
             shapeRenderer.point(centerX+x, centerY+(float)Math.sqrt(yy), 0);
             shapeRenderer.setProjectionMatrix(camera);
         }

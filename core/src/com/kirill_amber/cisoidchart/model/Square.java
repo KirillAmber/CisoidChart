@@ -11,20 +11,23 @@ import com.badlogic.gdx.math.Matrix4;
 
 public class Square extends AbstractFigure {
     private float size;
+    private float step;
 
     public Square(){
         super();
         size = 10;
-    }
-
-    @Override
-    public void setColor(Color color) {
-        shapeRenderer.setColor(color);
+        step = 0;
     }
 
     public Square(float x, float y, float size, Color color) {
         super(x, y, color);
         this.size = size;
+        step = 0;
+    }
+
+    @Override
+    public void setColor(Color color) {
+        shapeRenderer.setColor(color);
     }
 
     public float getSize(){
@@ -35,11 +38,19 @@ public class Square extends AbstractFigure {
         this.size = size;
     }
 
-    @Override
-    public void draw(Matrix4 camera){
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(x, y, size, size);
-        shapeRenderer.setProjectionMatrix(camera);
-        shapeRenderer.end();
+    public ShapeRenderer getShapeRender(){
+        return shapeRenderer;
     }
+
+    public void draw(float a, float length, float centerX, float centerY, Matrix4 camera){
+        x = step;
+            y = (float) Math.pow(x, 3) / (2 * a - x);
+            shapeRenderer.rect(centerX + x-size/2.0f, centerY + (float) Math.sqrt(y)-size/2.0f, size, size);
+            shapeRenderer.setProjectionMatrix(camera);
+        if(step <= length)
+        step++;
+        else step = 0;
+        shapeRenderer.setProjectionMatrix(camera);
+    }
+
 }

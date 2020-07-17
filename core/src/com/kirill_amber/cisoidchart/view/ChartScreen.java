@@ -78,19 +78,22 @@ public class ChartScreen implements Screen {
 
 
        if(Gdx.graphics.getWidth() <= Gdx.graphics.getHeight()) {
-           square.setSize(Gdx.graphics.getWidth()/4.0f);
+           square.setSize(Gdx.graphics.getWidth()/10.0f);
 
            yAxis.setY2(Gdx.graphics.getHeight()-(Gdx.graphics.getHeight()-Gdx.graphics.getWidth())/2.0f);
            yAxis.setY((Gdx.graphics.getHeight()-Gdx.graphics.getWidth())/2.0f);
 
        }
        else if(Gdx.graphics.getHeight() < Gdx.graphics.getWidth()){
-           square.setSize(Gdx.graphics.getHeight()/4.0f);
+           square.setSize(Gdx.graphics.getHeight()/10.0f);
 
            xAxis.setX2(Gdx.graphics.getWidth()-(Gdx.graphics.getWidth()-Gdx.graphics.getHeight())/2.0f);
            xAxis.setX((Gdx.graphics.getWidth()-Gdx.graphics.getHeight())/2.0f);
 
        }
+
+        System.out.println("x length " + (xAxis.getX2()-xAxis.getX()) + "\ny length " + (yAxis.getY2()-yAxis.getY()));
+        System.out.println("");
 
        difference_between_axles = xAxis.getX2()-yAxis.getX();
        line_spacing = difference_between_axles/(SIZE_GRID/2.0f);
@@ -124,8 +127,8 @@ public class ChartScreen implements Screen {
             count++;
         }
 
-       square.setX(Gdx.graphics.getWidth()/2.0f-square.getSize()/2.0f);
-       square.setY(Gdx.graphics.getHeight()/2.0f-square.getSize()/2.0f);
+       /*square.setX(Gdx.graphics.getWidth()/2.0f-square.getSize()/2.0f);
+       square.setY(Gdx.graphics.getHeight()/2.0f-square.getSize()/2.0f);*/
 
     }
 
@@ -134,9 +137,10 @@ public class ChartScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         update(delta);
+
         sb.begin();
         sb.setProjectionMatrix(camera.combined);
-        square.draw(camera.combined);
+
         for(Axis element : arrayVerticalLines){
             if(element.getX()<=xAxis.getX2())
             element.draw(camera.combined);
@@ -150,10 +154,19 @@ public class ChartScreen implements Screen {
         xAxis.draw(camera.combined);
         yAxis.draw(camera.combined);
 
-        //cisoid.drawGraph((xAxis.getX2()-xAxis.getX())/2.0f, (yAxis.getY2()-yAxis.getY())/2.0f, camera.combined);
 
+        float centerX = (xAxis.getX() + xAxis.getX2())/2.0f;
+        float centerY = (yAxis.getX() + xAxis.getX2())/2.0f;
+
+        //cisoid.drawGraph(centerX, centerY, xAxis.getX2(), yAxis.getY2(), camera.combined);
         cisoid.drawGraph(Gdx.graphics.getWidth()/2.0f, Gdx.graphics.getHeight()/2.0f,
                 xAxis.getX2(), yAxis.getY2(), camera.combined);
+
+        square.getShapeRender().begin(ShapeRenderer.ShapeType.Filled);
+        square.draw(cisoid.getA(), cisoid.getX(), Gdx.graphics.getWidth()/2.0f,
+                Gdx.graphics.getHeight()/2.0f, camera.combined);
+        square.getShapeRender().end();
+
         sb.end();
     }
 

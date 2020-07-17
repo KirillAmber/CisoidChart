@@ -51,7 +51,6 @@ public class Axis extends AbstractFigure {
         return y2;
     }
 
-    @Override
     public void draw(Matrix4 camera) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.line(x, y, x2, y2);

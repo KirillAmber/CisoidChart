@@ -39,6 +39,5 @@ public abstract class AbstractFigure {
         return y;
     }
     public abstract void setColor(Color color);
-    public abstract void draw(Matrix4 camera);
 
 }
