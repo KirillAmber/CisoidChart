@@ -42,6 +42,10 @@ public class Square extends AbstractFigure {
         return shapeRenderer;
     }
 
+    public void setStep(float step) {
+        this.step = step;
+    }
+
     public void draw(float a, float length, float centerX, float centerY, Matrix4 camera){
         x = step;
             y = (float) Math.pow(x, 3) / (2 * a - x);

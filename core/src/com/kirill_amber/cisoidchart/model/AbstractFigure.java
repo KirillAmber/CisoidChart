@@ -7,7 +7,6 @@ package com.kirill_amber.cisoidchart.model;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Matrix4;
 
 public abstract class AbstractFigure {
     protected ShapeRenderer shapeRenderer;
@@ -18,7 +17,7 @@ public abstract class AbstractFigure {
         x = 0;
         y = 0;
         shapeRenderer = new ShapeRenderer();
-        shapeRenderer.setColor(Color.GREEN);
+        shapeRenderer.setColor(Color.GRAY);
     }
     public AbstractFigure(float x, float y, Color color){
         this.x = x;

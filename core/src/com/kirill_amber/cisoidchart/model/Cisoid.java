@@ -5,10 +5,10 @@
 
 package com.kirill_amber.cisoidchart.model;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 
-import java.util.ArrayList;
 
 //y^2 = x^3/(2a-x), где a - радиус окружности
 //length_graph - длинна окружности
@@ -26,6 +26,14 @@ public class Cisoid {
         shapeRenderer = new ShapeRenderer();
     }
 
+    public void setA(float a) {
+        this.a = a;
+    }
+
+    public void setLength_graph(float length_graph) {
+        this.length_graph = length_graph;
+    }
+
     public float getA() {
         return a;
     }
@@ -39,6 +47,7 @@ public class Cisoid {
     }
     public void drawGraph(float centerX, float centerY, float xAxis_boundary, float yAxis_boundary, Matrix4 camera){
         shapeRenderer.begin(ShapeRenderer.ShapeType.Point);
+        shapeRenderer.setColor(Color.ORANGE);
         for(int i = 0; i < length_graph; i++){
             x = i;
             if(x == 2*a){

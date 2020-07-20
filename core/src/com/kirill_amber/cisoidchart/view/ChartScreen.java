@@ -11,17 +11,29 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.kirill_amber.cisoidchart.Main;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.kirill_amber.cisoidchart.model.Axis;
 import com.kirill_amber.cisoidchart.model.Cisoid;
 import com.kirill_amber.cisoidchart.model.Square;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public class ChartScreen implements Screen {
     private final int SIZE_GRID = 20;
+    private boolean isClickedAnimation;
+    private boolean isClickedPlot;
 
     private SpriteBatch sb;
     private OrthographicCamera camera;
@@ -34,13 +46,37 @@ public class ChartScreen implements Screen {
     private float difference_between_axles;
     private float line_spacing;
 
-    Cisoid cisoid;
+    //widget
+    private Skin skin;
+    private ScalingViewport scalingViewport;
+    private Stage stage;
+    private Label label_of_a;
+    private Label label_of_length;
+    private Label label_of_warning;
+    private TextField length_textField;
+    private TextField a_textField;
+    private TextButton plotButton;
+    private TextButton animationButton;
+    //widget
 
+
+    private Cisoid cisoid;
+
+    //инициализация
     @Override
     public void show() {
+        isClickedAnimation = false;
+        isClickedPlot = false;
         sb = new SpriteBatch();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.translate(camera.viewportWidth/2, camera.viewportHeight/2);
+
+        skin = new Skin(Gdx.files.internal("uisking.json"));
+        skin.addRegions(new TextureAtlas("uisking.atlas"));
+
+        scalingViewport = new ScalingViewport(Scaling.fit, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
+        stage = new Stage(scalingViewport, sb);
+        Gdx.input.setInputProcessor(stage);
 
         square = new Square(0, 0,
                 100, Color.BLUE);
@@ -60,10 +96,73 @@ public class ChartScreen implements Screen {
         }
 
         cisoid = new Cisoid(100, 2000);
+
+
+        //widget
+        plotButton = new TextButton("Plot", skin);
+        plotButton.setSize(200, 40);
+        plotButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent e, float x, float y){
+                Pattern pattern = Pattern.compile("[\\D&&[^\\.]]");
+                Matcher matcher_a_text_field = pattern.matcher(a_textField.getText());
+                Matcher matcher_length_text_field = pattern.matcher(length_textField.getText());
+
+                if(!matcher_a_text_field.find() && !matcher_length_text_field.find()) {
+                    isClickedPlot = true;
+                    label_of_warning.setVisible(false);
+                    cisoid.setA(Float.parseFloat(a_textField.getText()));
+                    cisoid.setLength_graph(Float.parseFloat(length_textField.getText()));
+                    square.setStep(0);
+                }
+                else label_of_warning.setVisible(true);
+            }
+        });
+
+        animationButton = new TextButton("Animation", skin);
+        animationButton.setSize(200, 40);
+        animationButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent e, float x, float y){
+                isClickedAnimation = !isClickedAnimation;
+                square.setStep(0);
+            }
+        });
+
+        length_textField = new TextField("2000", skin);
+        length_textField.setSize(200, 40);
+
+        label_of_length = new Label("Entry length:", skin);
+        label_of_length.setSize(200,40);
+        label_of_length.setColor(Color.BLACK);
+
+        a_textField = new TextField("100", skin);
+        a_textField.setSize(200,40);
+
+        label_of_a = new Label("Entry radius(a):", skin);
+        label_of_a.setSize(200, 40);
+        label_of_a.setColor(Color.BLACK);
+
+        label_of_warning = new Label("INVALID INPUT DATA", skin);
+        label_of_warning.setSize(200, 40);
+        label_of_warning.setColor(Color.RED);
+        label_of_warning.setVisible(false);
+
+        stage.addActor(plotButton);
+        stage.addActor(animationButton);
+        stage.addActor(length_textField);
+        stage.addActor(label_of_length);
+        stage.addActor(a_textField);
+        stage.addActor(label_of_a);
+        stage.addActor(label_of_warning);
+        //widget
+
+
     }
-    //как масштабировать
+    //масштабирование
     public void update(float dt){
         camera.update();
+        scalingViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         xAxis.setX(Gdx.graphics.getWidth()-Gdx.graphics.getWidth());
         xAxis.setY(Gdx.graphics.getHeight()/2.0f);
@@ -98,6 +197,7 @@ public class ChartScreen implements Screen {
        difference_between_axles = xAxis.getX2()-yAxis.getX();
        line_spacing = difference_between_axles/(SIZE_GRID/2.0f);
 
+       //
         int count = 0;
         for(int i = 0; i < SIZE_GRID/2; i++){
             //правая половина
@@ -127,14 +227,23 @@ public class ChartScreen implements Screen {
             count++;
         }
 
-       /*square.setX(Gdx.graphics.getWidth()/2.0f-square.getSize()/2.0f);
-       square.setY(Gdx.graphics.getHeight()/2.0f-square.getSize()/2.0f);*/
+
+       //widget
+        plotButton.setPosition(camera.viewportWidth- plotButton.getWidth(), 0);
+        animationButton.setPosition(plotButton.getX(), plotButton.getHeight());
+        length_textField.setPosition(animationButton.getX(), animationButton.getY()+animationButton.getHeight());
+        label_of_length.setPosition(length_textField.getX(), length_textField.getY()+length_textField.getHeight());
+        a_textField.setPosition(label_of_length.getX(), label_of_length.getY()+label_of_length.getHeight());
+        label_of_a.setPosition(a_textField.getX(), a_textField.getY()+a_textField.getHeight());
+        label_of_warning.setPosition(label_of_a.getX(), label_of_a.getY()+label_of_a.getHeight());
+        //widget
 
     }
 
+    //отображение
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(255, 255, 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         update(delta);
 
@@ -159,15 +268,21 @@ public class ChartScreen implements Screen {
         float centerY = (yAxis.getX() + xAxis.getX2())/2.0f;
 
         //cisoid.drawGraph(centerX, centerY, xAxis.getX2(), yAxis.getY2(), camera.combined);
-        cisoid.drawGraph(Gdx.graphics.getWidth()/2.0f, Gdx.graphics.getHeight()/2.0f,
-                xAxis.getX2(), yAxis.getY2(), camera.combined);
+        if(isClickedPlot) {
+            cisoid.drawGraph(Gdx.graphics.getWidth() / 2.0f, Gdx.graphics.getHeight() / 2.0f,
+                    xAxis.getX2(), yAxis.getY2(), camera.combined);
+        }
 
-        square.getShapeRender().begin(ShapeRenderer.ShapeType.Filled);
-        square.draw(cisoid.getA(), cisoid.getX(), Gdx.graphics.getWidth()/2.0f,
-                Gdx.graphics.getHeight()/2.0f, camera.combined);
-        square.getShapeRender().end();
+        if(isClickedAnimation) {
+            square.getShapeRender().begin(ShapeRenderer.ShapeType.Filled);
+            square.draw(cisoid.getA(), cisoid.getX(), Gdx.graphics.getWidth() / 2.0f,
+                    Gdx.graphics.getHeight() / 2.0f, camera.combined);
+            square.getShapeRender().end();
+        }
 
         sb.end();
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
     }
 
     @Override
